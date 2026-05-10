@@ -14,7 +14,7 @@ if (mysqli_num_rows($check_result) > 0) {
     echo "<div class='content' style='text-align:center;'>
             <h2>Registration Failed</h2>
             <p>Username already exists!</p >
-            Go back to register
+            <a href='user.html' class='submit-btn'>Go back to register</a>
           </div>";
     exit;
 }
@@ -27,13 +27,13 @@ if (mysqli_query($conn, $sql)) {
     echo "<div class='content' style='text-align:center;'>
             <h2>Registration Successful!</h2>
             <p>You can now login to publish cars</p >
-            Go to login
+            <a href='user.html' class='submit-btn'>Go to login</a>
           </div>";
 } else {
     echo "<div class='content' style='text-align:center;'>
             <h2>Registration Failed</h2>
             <p>Error: " . mysqli_error($conn) . "</p >
-            Go back and try again
+            <a href='user.html' class='submit-btn'>Try Again</a>
           </div>";
 }
 

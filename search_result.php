@@ -1,24 +1,23 @@
 <?php
 include "conn.php";
 
-// Get search conditions
-$brand = $_GET['brand'] ?? '';
-$model = $_GET['model'] ?? '';
+// Get search parameters (search by model and year as required)
+$model = isset($_GET['model']) ? $_GET['model'] : '';
+$year = isset($_GET['year']) ? $_GET['year'] : '';
 $year = $_GET['year'] ?? '';
 $min_price = $_GET['min_price'] ?? '';
 $max_price = $_GET['max_price'] ?? '';
 
-// Build SQL query
-$sql = "SELECT * FROM cars WHERE 1=1";
-
+// Build query statement
+$sql = "SELECT * FROM cars WHERE model LIKE '%$model%'";
+if (!empty($year)) {
+    $sql .= " AND year = '$year'";
+}
 if (!empty($brand)) {
     $sql .= " AND brand LIKE '%$brand%'";
 }
 if (!empty($model)) {
     $sql .= " AND model LIKE '%$model%'";
-}
-if (!empty($year)) {
-    $sql .= " AND year = '$year'";
 }
 if (!empty($min_price)) {
     $sql .= " AND price >= '$min_price'";
@@ -26,7 +25,6 @@ if (!empty($min_price)) {
 if (!empty($max_price)) {
     $sql .= " AND price <= '$max_price'";
 }
-
 $result = mysqli_query($conn, $sql);
 ?>
 
@@ -35,40 +33,51 @@ $result = mysqli_query($conn, $sql);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Result</title>
+    <title>Search Results</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Car Selling Platform</div>
-        <div class="nav">
-            <a href=" ">Home</a >
-            <a href="intro.html">Intro</a >
-            <a href="user.html">User</a >
-            <a href="buyer.html">Buyer</a >
-            <a href="seller.html">Seller</a >
-        </div>
-    </div>
+    <header class="header">
+        <div class="logo">Car Sales Platform</div>
+        <nav class="nav">
+            <a href=" ">Homepage</a >
+            <a href="buyer.html">New Search</a >
+            <a href="user.html">Seller Login</a >
+        </nav>
+    </header>
 
-    <div class="buyer-container">
+    <div class="content">
         <h1>Search Results</h1>
+        <p>Search criteria: Model = "<?php echo $model; ?>"
+            <?php if (!empty($year)) echo ", Year = " . $year; ?>
+            <?php if (!empty($min_price)) echo ", Min Price = " . $min_price; ?>
+            <?php if (!empty($max_price)) echo ", Max Price = " . $max_price; ?>
+        </p >
+        <hr style="margin: 20px 0;">
 
-        <?php if (mysqli_num_rows($result) == 0): ?>
-            <p>No cars found.</p >
-        <?php else: ?>
-            <?php while ($car = mysqli_fetch_assoc($result)): ?>
-                <div class="car-item" style="background:#222; padding:20px; margin:15px 0; border-radius:10px; color:#fff;">
-                    <h3 style="color:#3498db; margin:0 0 10px;"><?= $car['brand'] ?> <?= $car['model'] ?></h3>
-                    <p>Year: <?= $car['year'] ?></p >
-                    <p style="color:#2ecc71; font-weight:bold;">Price: ¥<?= $car['price'] ?></p >
-                    <p>Description: <?= $car['description'] ?></p >
-                </div>
-            <?php endwhile; ?>
-        <?php endif; ?>
+        <?php if (mysqli_num_rows($result) > 0) { ?>
+            <div class="car-list">
+                <?php while ($row = mysqli_fetch_assoc($result)) { ?>
+                    <div class="car-item">
+                        <h3><?php echo $row['brand'] . ' ' . $row['model']; ?></h3>
+                        <p><strong>Year:</strong> <?php echo $row['year']; ?></p >
+                        <p><strong>Price:</strong> ¥<?php echo number_format($row['price'], 2); ?></p >
+                        <p><strong>Description:</strong> <?php echo $row['description']; ?></p >
+                    </div>
+                <?php } ?>
+            </div>
+        <?php } else { ?>
+            <p style="text-align: center; font-size: 1.2rem; color: #666;">
+                No cars found matching your search criteria.
+            </p >
+            <p style="text-align: center;">
+                <a href="buyer.html" class="back-btn">Try another search</a >
+            </p >
+        <?php } ?>
     </div>
 
-    <div class="footer">
-        <p>© 2026 Car Selling Website. All rights reserved.</p >
-    </div>
+    <footer class="footer">
+        <p>© 2025 Car Sales Platform. All Rights Reserved.</p >
+    </footer>
 </body>
 </html>
